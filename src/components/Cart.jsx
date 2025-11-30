@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react'
 import './Cart.css'
 import { isUserLoggedIn, getUserData } from '../utils/userStorage'
 import { loadUserCart, transformCollectionsData, placeOrder } from '../services/api'
+import { POST_PURCHASE_REDIRECT_URL } from '../config/api'
 import OrderSuccess from './OrderSuccess'
 
-function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate }) {
+function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate, onNavigate }) {
   const isLoggedIn = isUserLoggedIn()
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -138,6 +139,34 @@ function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onCl
         // Refetch cart to show empty cart
         await refetchCart()
       }, 100)
+
+      // Redirect to configured URL after showing success message (2 seconds delay)
+      setTimeout(() => {
+        const redirectUrl = POST_PURCHASE_REDIRECT_URL?.trim()
+        
+        if (redirectUrl) {
+          // Check if it's an external URL
+          if (redirectUrl.startsWith('http://') || redirectUrl.startsWith('https://')) {
+            // External URL - use window.location
+            window.location.href = redirectUrl
+          } else {
+            // Internal URL - use navigation callback if available, otherwise construct full URL
+            if (onNavigate && typeof onNavigate === 'function') {
+              // Use the navigation callback to change page
+              onNavigate('thank-you')
+              // Update URL manually
+              const currentOrigin = window.location.origin
+              const fullPath = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`
+              window.history.pushState({}, '', `${currentOrigin}${fullPath}`)
+            } else {
+              // Fallback: construct full URL with current origin
+              const currentOrigin = window.location.origin
+              const fullPath = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`
+              window.location.href = `${currentOrigin}${fullPath}`
+            }
+          }
+        }
+      }, 2000)
     } catch (err) {
       console.error('Error placing order:', err)
       setError('Failed to place order. Please try again.')

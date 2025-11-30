@@ -7,6 +7,7 @@ import LoginSignup from './components/LoginSignup'
 import Account from './components/Account'
 import Cart from './components/Cart'
 import Orders from './components/Orders'
+import ThankYou from './components/ThankYou'
 import { fetchCollections, transformCollectionsData, updateCartItem, loadUserCart } from './services/api'
 import { isUserLoggedIn, getUserData, getUserId } from './utils/userStorage'
 
@@ -144,6 +145,13 @@ function App() {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search)
       const productIdParam = urlParams.get('productId')
+      const pathname = window.location.pathname
+      
+      // Check if we're on the thank-you page
+      if (pathname.includes('/thank-you')) {
+        setCurrentPage('thank-you')
+        return
+      }
       
       if (productIdParam) {
         const productId = parseInt(productIdParam)
@@ -155,6 +163,12 @@ function App() {
         setSelectedProductId(null)
         setSelectedProduct(null)
       }
+    }
+
+    // Check initial URL on mount
+    const pathname = window.location.pathname
+    if (pathname.includes('/thank-you')) {
+      setCurrentPage('thank-you')
     }
 
     window.addEventListener('popstate', handlePopState)
@@ -603,12 +617,30 @@ function App() {
           onRemoveItem={handleRemoveItem}
           onClose={() => setCurrentPage('collections')}
           onCartUpdate={handleCartUpdate}
+          onNavigate={(page) => {
+            if (page === 'thank-you') {
+              setCurrentPage('thank-you')
+              window.history.pushState({}, '', '/Ceremic/thank-you')
+            }
+          }}
         />
       )}
 
       {currentPage === 'orders' && (
         <Orders
           onClose={() => setCurrentPage('home')}
+        />
+      )}
+
+      {currentPage === 'thank-you' && (
+        <ThankYou
+          onRedirectToHome={() => {
+            setCurrentPage('home')
+            // Update URL to home page (remove /thank-you from path)
+            const currentPath = window.location.pathname
+            const homePath = currentPath.replace('/thank-you', '').replace(/\/$/, '') || '/Ceremic/'
+            window.history.pushState({}, '', homePath)
+          }}
         />
       )}
 
