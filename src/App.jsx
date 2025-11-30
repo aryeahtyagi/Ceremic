@@ -1,203 +1,638 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import './App.css'
+import Collections from './components/Collections'
+import ProductDetailPage from './components/ProductDetailPage'
+import Home from './components/Home'
+import LoginSignup from './components/LoginSignup'
+import Account from './components/Account'
+import Cart from './components/Cart'
+import Orders from './components/Orders'
+import { fetchCollections, transformCollectionsData, updateCartItem, loadUserCart } from './services/api'
+import { isUserLoggedIn, getUserData, getUserId } from './utils/userStorage'
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('home')
+  const [selectedProductId, setSelectedProductId] = useState(null)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [cart, setCart] = useState([])
+  const [products, setProducts] = useState([])
+  const [showLoginSignup, setShowLoginSignup] = useState(false)
+  const [pendingAddToCart, setPendingAddToCart] = useState(null)
+  const [showAccount, setShowAccount] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(isUserLoggedIn())
+  const [userData, setUserData] = useState(getUserData())
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Load products on mount
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await fetchCollections()
+        const transformedProducts = transformCollectionsData(data)
+        setProducts(transformedProducts)
+      } catch (error) {
+        console.error('Error loading products:', error)
+      }
+    }
+    loadProducts()
+  }, [])
+
+  // Load cart on mount if user is logged in
+  useEffect(() => {
+    const loadCart = async () => {
+      if (!isLoggedIn) {
+        setCart([])
+        return
+      }
+
+      const userData = getUserData()
+      if (!userData) {
+        setCart([])
+        return
+      }
+
+      try {
+        const cartData = await loadUserCart(userData)
+        
+        // Match cart items with product details
+        const products = transformCollectionsData(cartData.ceremics || [])
+        const cartWithProducts = (cartData.cart || []).map(cartItem => {
+          const product = products.find(p => p.id === cartItem.productId)
+          if (product) {
+            return {
+              ...product,
+              quantity: cartItem.quantity
+            }
+          }
+          return null
+        }).filter(item => item !== null)
+
+        setCart(cartWithProducts)
+      } catch (error) {
+        console.error('Error loading cart:', error)
+        setCart([])
+      }
+    }
+
+    loadCart()
+  }, [isLoggedIn])
+
+  // Check URL parameters on mount and when products are loaded
+  useEffect(() => {
+    const loadProductFromUrl = async (productId) => {
+      try {
+        let productList = products
+        if (productList.length === 0) {
+          const data = await fetchCollections()
+          productList = transformCollectionsData(data)
+          setProducts(productList)
+        }
+        const product = productList.find(p => p.id === productId)
+        if (product) {
+          setSelectedProductId(productId)
+          setSelectedProduct(product)
+          setCurrentPage('product-detail')
+        } else {
+          // Product not found, redirect to collections
+          setCurrentPage('collections')
+          setSelectedProductId(null)
+          setSelectedProduct(null)
+        }
+      } catch (error) {
+        console.error('Error loading product:', error)
+        setCurrentPage('collections')
+      }
+    }
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const productIdParam = urlParams.get('productId')
+    
+    if (productIdParam) {
+      const productId = parseInt(productIdParam)
+      if (!isNaN(productId)) {
+        loadProductFromUrl(productId)
+      }
+    }
+  }, [products]) // Re-run when products are loaded
+
+  // Handle browser back/forward buttons and URL changes
+  useEffect(() => {
+    const loadProductFromUrl = async (productId) => {
+      try {
+        let productList = products
+        if (productList.length === 0) {
+          const data = await fetchCollections()
+          productList = transformCollectionsData(data)
+          setProducts(productList)
+        }
+        const product = productList.find(p => p.id === productId)
+        if (product) {
+          setSelectedProductId(productId)
+          setSelectedProduct(product)
+          setCurrentPage('product-detail')
+        } else {
+          setCurrentPage('collections')
+          setSelectedProductId(null)
+          setSelectedProduct(null)
+        }
+      } catch (error) {
+        console.error('Error loading product:', error)
+        setCurrentPage('collections')
+      }
+    }
+
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const productIdParam = urlParams.get('productId')
+      
+      if (productIdParam) {
+        const productId = parseInt(productIdParam)
+        if (!isNaN(productId)) {
+          loadProductFromUrl(productId)
+        }
+      } else {
+        setCurrentPage('home')
+        setSelectedProductId(null)
+        setSelectedProduct(null)
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [products])
+
+  // Helper function to get cart item quantity
+  const getCartQuantity = (productId) => {
+    const cartItem = cart.find(item => item.id === productId)
+    return cartItem ? cartItem.quantity : 0
+  }
+
+  // Helper function to check if product is in cart
+  const isProductInCart = (productId) => {
+    return cart.some(item => item.id === productId)
+  }
+
+  const handleAddToCart = async (product) => {
+    // Check if user is logged in
+    if (!isUserLoggedIn()) {
+      // Store the product to add after login
+      setPendingAddToCart(product)
+      // Show login/signup modal
+      setShowLoginSignup(true)
+      return
+    }
+
+    const userId = getUserId()
+    if (!userId) {
+      console.error('User ID not found')
+      return
+    }
+
+    try {
+      // Get current quantity from cart or default to 0
+      const existingItem = cart.find(item => item.id === product.id)
+      const currentQuantity = existingItem ? existingItem.quantity : 0
+      const newQuantity = currentQuantity + 1
+
+      // Call API to update cart
+      const cartItem = await updateCartItem(userId, product.id, newQuantity)
+
+      // Update local cart state based on API response
+      setCart(prevCart => {
+        const existingItem = prevCart.find(item => item.id === product.id)
+        if (existingItem) {
+          return prevCart.map(item =>
+            item.id === product.id
+              ? { ...item, quantity: cartItem.quantity }
+              : item
+          )
+        } else {
+          return [...prevCart, { ...product, quantity: cartItem.quantity }]
+        }
+      })
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+      // Optionally show error message to user
+    }
+  }
+
+  const handleIncreaseQuantity = async (productId) => {
+    const userId = getUserId()
+    if (!userId) {
+      console.error('User ID not found')
+      return
+    }
+
+    try {
+      // Get current quantity
+      const existingItem = cart.find(item => item.id === productId)
+      const currentQuantity = existingItem ? existingItem.quantity : 0
+      const newQuantity = currentQuantity + 1
+
+      // Call API to update cart
+      const cartItem = await updateCartItem(userId, productId, newQuantity)
+
+      // Update local cart state based on API response
+      setCart(prevCart =>
+        prevCart.map(item =>
+          item.id === productId
+            ? { ...item, quantity: cartItem.quantity }
+            : item
+        )
+      )
+    } catch (error) {
+      console.error('Error increasing quantity:', error)
+    }
+  }
+
+  const handleQuickAddSix = async (product) => {
+    // Check if user is logged in
+    if (!isUserLoggedIn()) {
+      // Store the product to add after login
+      setPendingAddToCart(product)
+      // Show login/signup modal
+      setShowLoginSignup(true)
+      return
+    }
+
+    const userId = getUserId()
+    if (!userId) {
+      console.error('User ID not found')
+      return
+    }
+
+    try {
+      // Get current quantity from cart or default to 0
+      const existingItem = cart.find(item => item.id === product.id)
+      const currentQuantity = existingItem ? existingItem.quantity : 0
+      const newQuantity = currentQuantity + 6
+
+      // Call API to update cart
+      const cartItem = await updateCartItem(userId, product.id, newQuantity)
+
+      // Update local cart state based on API response
+      setCart(prevCart => {
+        const existingItem = prevCart.find(item => item.id === product.id)
+        if (existingItem) {
+          return prevCart.map(item =>
+            item.id === product.id
+              ? { ...item, quantity: cartItem.quantity }
+              : item
+          )
+        } else {
+          return [...prevCart, { ...product, quantity: cartItem.quantity }]
+        }
+      })
+    } catch (error) {
+      console.error('Error quick adding to cart:', error)
+    }
+  }
+
+  const handleRemoveItem = async (productId) => {
+    const userId = getUserId()
+    if (!userId) {
+      console.error('User ID not found')
+      return
+    }
+
+    try {
+      // Set quantity to 0 to remove item
+      await updateCartItem(userId, productId, 0)
+      
+      // Remove from local cart state
+      setCart(prevCart => prevCart.filter(item => item.id !== productId))
+    } catch (error) {
+      console.error('Error removing item from cart:', error)
+    }
+  }
+
+  const handleDecreaseQuantity = async (productId) => {
+    const userId = getUserId()
+    if (!userId) {
+      console.error('User ID not found')
+      return
+    }
+
+    try {
+      // Get current quantity
+      const existingItem = cart.find(item => item.id === productId)
+      const currentQuantity = existingItem ? existingItem.quantity : 1
+      const newQuantity = Math.max(0, currentQuantity - 1)
+
+      if (newQuantity === 0) {
+        // Remove item from cart
+        setCart(prevCart => prevCart.filter(item => item.id !== productId))
+        // Still call API to update (quantity 0 might remove it on backend)
+        await updateCartItem(userId, productId, 0)
+      } else {
+        // Call API to update cart
+        const cartItem = await updateCartItem(userId, productId, newQuantity)
+
+        // Update local cart state based on API response
+        setCart(prevCart =>
+          prevCart.map(item =>
+            item.id === productId
+              ? { ...item, quantity: cartItem.quantity }
+              : item
+          )
+        )
+      }
+    } catch (error) {
+      console.error('Error decreasing quantity:', error)
+    }
+  }
+
+  const handleLoginSuccess = async (userData) => {
+    // Update login state and user data
+    setIsLoggedIn(true)
+    setUserData(userData)
+    
+    // Close login modal
+    setShowLoginSignup(false)
+    
+    // Load cart from API
+    try {
+      const cartData = await loadUserCart(userData)
+      
+      // Match cart items with product details
+      const products = transformCollectionsData(cartData.ceremics || [])
+      const cartWithProducts = (cartData.cart || []).map(cartItem => {
+        const product = products.find(p => p.id === cartItem.productId)
+        if (product) {
+          return {
+            ...product,
+            quantity: cartItem.quantity
+          }
+        }
+        return null
+      }).filter(item => item !== null)
+
+      setCart(cartWithProducts)
+    } catch (error) {
+      console.error('Error loading cart after login:', error)
+      setCart([])
+    }
+    
+    // If there was a pending add to cart, execute it now
+    if (pendingAddToCart) {
+      const userId = getUserId()
+      if (userId) {
+        try {
+          const cartItem = await updateCartItem(userId, pendingAddToCart.id, 1)
+          setCart(prevCart => {
+            const existingItem = prevCart.find(item => item.id === pendingAddToCart.id)
+            if (existingItem) {
+              return prevCart.map(item =>
+                item.id === pendingAddToCart.id
+                  ? { ...item, quantity: cartItem.quantity }
+                  : item
+              )
+            } else {
+              return [...prevCart, { ...pendingAddToCart, quantity: cartItem.quantity }]
+            }
+          })
+        } catch (error) {
+          console.error('Error adding pending item to cart:', error)
+        }
+      }
+      setPendingAddToCart(null)
+    }
+  }
+
+  const handleCloseLoginSignup = () => {
+    setShowLoginSignup(false)
+    // Clear pending add to cart if user closes without logging in
+    setPendingAddToCart(null)
+  }
+
+  const handleViewProduct = (product) => {
+    setSelectedProductId(product.id)
+    setSelectedProduct(product) // Store product data for passing to detail page
+    setCurrentPage('product-detail')
+    // Update URL without page reload
+    window.history.pushState({}, '', `?productId=${product.id}`)
+  }
+
+  const handleViewProductFromHome = (product) => {
+    handleViewProduct(product)
+  }
+
+  const handleCloseProductDetail = () => {
+    setSelectedProductId(null)
+    setSelectedProduct(null)
+    setCurrentPage('collections')
+    // Update URL to remove productId parameter
+    window.history.pushState({}, '', window.location.pathname)
+  }
+
+  // Calculate total items in cart (sum of all quantities)
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0)
+
+  // Memoize cart update callback to prevent infinite loops
+  const handleCartUpdate = useCallback((updatedCart) => {
+    setCart(updatedCart)
+  }, [])
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen && !event.target.closest('.nav-container')) {
+        setMobileMenuOpen(false)
+      }
+    }
+
+    if (mobileMenuOpen) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [mobileMenuOpen])
+
   return (
     <div className="App">
       {/* Navigation */}
       <nav className="navbar">
         <div className="nav-container">
-          <div className="logo">
+          <div className="logo" onClick={() => {
+            setCurrentPage('home')
+            setMobileMenuOpen(false)
+            window.history.pushState({}, '', window.location.pathname)
+          }} style={{ cursor: 'pointer' }}>
             <span className="logo-icon">🏺</span>
             <span className="logo-text">Ceremic</span>
           </div>
-          <ul className="nav-menu">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#collection">Collection</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-          <button className="cart-btn">
-            <span>🛒</span>
-            <span className="cart-count">0</span>
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span className={mobileMenuOpen ? 'hamburger open' : 'hamburger'}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
           </button>
+
+          {/* Desktop Menu */}
+          <ul className="nav-menu">
+            <li><a href="#home" onClick={(e) => { e.preventDefault(); setCurrentPage('home') }}>Home</a></li>
+            <li><a href="#collection" onClick={(e) => { 
+              e.preventDefault(); 
+              setCurrentPage('collections')
+              window.history.pushState({}, '', window.location.pathname)
+            }}>Collection</a></li>
+            <li><a href="#about" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); window.scrollTo({ top: document.getElementById('about')?.offsetTop - 80, behavior: 'smooth' }) }}>About</a></li>
+            <li><a href="#contact" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); window.scrollTo({ top: document.getElementById('contact')?.offsetTop - 80, behavior: 'smooth' }) }}>Contact</a></li>
+            {isLoggedIn && (
+              <li><a href="#orders" onClick={(e) => { 
+                e.preventDefault(); 
+                setCurrentPage('orders')
+                window.history.pushState({}, '', window.location.pathname)
+              }}>My Orders</a></li>
+            )}
+          </ul>
+
+          {/* Mobile Menu */}
+          <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+            <ul className="mobile-nav-menu">
+              <li><a href="#home" onClick={(e) => { 
+                e.preventDefault(); 
+                setCurrentPage('home')
+                setMobileMenuOpen(false)
+              }}>Home</a></li>
+              <li><a href="#collection" onClick={(e) => { 
+                e.preventDefault(); 
+                setCurrentPage('collections')
+                setMobileMenuOpen(false)
+                window.history.pushState({}, '', window.location.pathname)
+              }}>Collection</a></li>
+              <li><a href="#about" onClick={(e) => { 
+                e.preventDefault(); 
+                setCurrentPage('home')
+                setMobileMenuOpen(false)
+                window.scrollTo({ top: document.getElementById('about')?.offsetTop - 80, behavior: 'smooth' })
+              }}>About</a></li>
+              <li><a href="#contact" onClick={(e) => { 
+                e.preventDefault(); 
+                setCurrentPage('home')
+                setMobileMenuOpen(false)
+                window.scrollTo({ top: document.getElementById('contact')?.offsetTop - 80, behavior: 'smooth' })
+              }}>Contact</a></li>
+              {isLoggedIn && (
+                <li><a href="#orders" onClick={(e) => { 
+                  e.preventDefault(); 
+                  setCurrentPage('orders')
+                  setMobileMenuOpen(false)
+                  window.history.pushState({}, '', window.location.pathname)
+                }}>My Orders</a></li>
+              )}
+            </ul>
+          </div>
+
+          <div className="nav-actions">
+            <button 
+              className={`account-btn ${isLoggedIn ? 'account-btn-logged-in' : ''}`}
+              onClick={() => {
+                setShowAccount(true)
+                setMobileMenuOpen(false)
+              }}
+              title={isLoggedIn ? "My Account" : "Login / Sign Up"}
+            >
+              {isLoggedIn ? (
+                <>
+                  <span className="account-icon">👋</span>
+                  <span className="account-icon-text account-text-mobile-hidden">Hi {userData?.username || 'User'}</span>
+                </>
+              ) : (
+                <>
+                  <span className="account-icon">👤</span>
+                  <span className="account-icon-text account-text-mobile-hidden">Login</span>
+                </>
+              )}
+            </button>
+            <button 
+              className="cart-btn"
+              onClick={() => {
+                setCurrentPage('cart')
+                setMobileMenuOpen(false)
+              }}
+            >
+              <span>🛒</span>
+              <span className="cart-count">{cartCount}</span>
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="hero" id="home">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              Handcrafted Ceramics
-              <span className="title-accent"> for Modern Living</span>
-            </h1>
-            <p className="hero-description">
-              Discover our exquisite collection of handcrafted ceramics, 
-              where traditional artistry meets contemporary design. 
-              Each piece tells a story of craftsmanship and elegance.
-            </p>
-            <div className="hero-buttons">
-              <button className="btn btn-primary">Explore Collection</button>
-              <button className="btn btn-secondary">Learn More</button>
-            </div>
-          </div>
-          <div className="hero-image">
-            <div className="ceramic-showcase">
-              <div className="ceramic-item ceramic-1"></div>
-              <div className="ceramic-item ceramic-2"></div>
-              <div className="ceramic-item ceramic-3"></div>
-            </div>
-          </div>
-        </div>
-        <div className="scroll-indicator">
-          <span>Scroll</span>
-          <div className="scroll-line"></div>
-        </div>
-      </section>
+      {currentPage === 'home' && (
+        <Home 
+          onNavigateToCollections={() => setCurrentPage('collections')}
+          onViewProduct={handleViewProductFromHome}
+        />
+      )}
 
-      {/* Features Section */}
-      <section className="features">
-        <div className="features-container">
-          <div className="feature-card">
-            <div className="feature-icon">🎨</div>
-            <h3>Handcrafted</h3>
-            <p>Each piece is carefully crafted by skilled artisans</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🌿</div>
-            <h3>Eco-Friendly</h3>
-            <p>Made with sustainable materials and processes</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">✨</div>
-            <h3>Unique Designs</h3>
-            <p>One-of-a-kind pieces for your home</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🚚</div>
-            <h3>Free Shipping</h3>
-            <p>Complimentary shipping on orders over $50</p>
-          </div>
-        </div>
-      </section>
+      {currentPage === 'collections' && (
+        <Collections 
+          onAddToCart={handleAddToCart}
+          onViewProduct={handleViewProduct}
+          cart={cart}
+          onIncreaseQuantity={handleIncreaseQuantity}
+          onDecreaseQuantity={handleDecreaseQuantity}
+          onQuickAddSix={handleQuickAddSix}
+        />
+      )}
 
-      {/* Collection Preview */}
-      <section className="collection-preview" id="collection">
-        <div className="section-header">
-          <h2>Featured Collection</h2>
-          <p>Curated pieces that blend beauty with functionality</p>
-        </div>
-        <div className="collection-grid">
-          <div className="product-card">
-            <div className="product-image product-1"></div>
-            <div className="product-info">
-              <h3>Terracotta Vase</h3>
-              <p className="product-category">Decorative</p>
-              <p className="product-price">$45</p>
-            </div>
-          </div>
-          <div className="product-card">
-            <div className="product-image product-2"></div>
-            <div className="product-info">
-              <h3>Ceramic Dinner Set</h3>
-              <p className="product-category">Dining</p>
-              <p className="product-price">$120</p>
-            </div>
-          </div>
-          <div className="product-card">
-            <div className="product-image product-3"></div>
-            <div className="product-info">
-              <h3>Hand-painted Bowl</h3>
-              <p className="product-category">Kitchen</p>
-              <p className="product-price">$35</p>
-            </div>
-          </div>
-          <div className="product-card">
-            <div className="product-image product-4"></div>
-            <div className="product-info">
-              <h3>Modern Planter</h3>
-              <p className="product-category">Garden</p>
-              <p className="product-price">$55</p>
-            </div>
-          </div>
-        </div>
-        <button className="btn btn-outline">View All Products</button>
-      </section>
+      {currentPage === 'product-detail' && (
+        <ProductDetailPage
+          productId={selectedProductId}
+          product={selectedProduct}
+          onClose={handleCloseProductDetail}
+          onAddToCart={handleAddToCart}
+          cart={cart}
+          onIncreaseQuantity={handleIncreaseQuantity}
+          onDecreaseQuantity={handleDecreaseQuantity}
+          onQuickAddSix={handleQuickAddSix}
+        />
+      )}
 
-      {/* About Section */}
-      <section className="about" id="about">
-        <div className="about-container">
-          <div className="about-image">
-            <div className="about-visual"></div>
-          </div>
-          <div className="about-content">
-            <h2>Our Story</h2>
-            <p>
-              Ceremic was born from a passion for traditional craftsmanship 
-              and modern aesthetics. We work directly with skilled artisans 
-              to bring you unique, high-quality ceramics that enhance your 
-              living space.
-            </p>
-            <p>
-              Every piece in our collection is carefully selected for its 
-              quality, design, and ability to bring warmth and character 
-              to your home.
-            </p>
-            <button className="btn btn-primary">Read More</button>
-          </div>
-        </div>
-      </section>
+      {currentPage === 'cart' && (
+        <Cart
+          cart={cart}
+          onIncreaseQuantity={handleIncreaseQuantity}
+          onDecreaseQuantity={handleDecreaseQuantity}
+          onRemoveItem={handleRemoveItem}
+          onClose={() => setCurrentPage('collections')}
+          onCartUpdate={handleCartUpdate}
+        />
+      )}
 
-      {/* CTA Section */}
-      <section className="cta-section">
-        <div className="cta-content">
-          <h2>Ready to Transform Your Space?</h2>
-          <p>Browse our complete collection and find the perfect pieces for your home</p>
-          <button className="btn btn-primary btn-large">Shop Now</button>
-        </div>
-      </section>
+      {currentPage === 'orders' && (
+        <Orders
+          onClose={() => setCurrentPage('home')}
+        />
+      )}
 
-      {/* Footer */}
-      <footer className="footer" id="contact">
-        <div className="footer-container">
-          <div className="footer-section">
-            <div className="footer-logo">
-              <span className="logo-icon">🏺</span>
-              <span className="logo-text">Ceremic</span>
-            </div>
-            <p>Handcrafted ceramics for modern living</p>
-          </div>
-          <div className="footer-section">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#collection">Collection</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h4>Contact</h4>
-            <ul>
-              <li>Email: hello@ceremic.com</li>
-              <li>Phone: +1 (555) 123-4567</li>
-              <li>Address: 123 Artisan St, Craft City</li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h4>Follow Us</h4>
-            <div className="social-links">
-              <a href="#" aria-label="Instagram">📷</a>
-              <a href="#" aria-label="Facebook">👥</a>
-              <a href="#" aria-label="Pinterest">📌</a>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>&copy; 2024 Ceremic. All rights reserved.</p>
-        </div>
-      </footer>
+      {/* Login/Signup Modal */}
+      {showLoginSignup && (
+        <LoginSignup
+          onLoginSuccess={handleLoginSuccess}
+          onClose={handleCloseLoginSignup}
+        />
+      )}
+
+      {/* Account Modal */}
+      {showAccount && (
+        <Account
+          onClose={() => setShowAccount(false)}
+          onLoginClick={() => {
+            setShowAccount(false)
+            setShowLoginSignup(true)
+          }}
+        />
+      )}
+
+      {/* Admin Section - Only accessible via direct URL */}
     </div>
   )
 }

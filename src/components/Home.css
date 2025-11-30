@@ -1,0 +1,1281 @@
+/* Hero Section - Ceramic Themed */
+.hero-home {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  padding: 8rem 2rem 4rem;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(212, 165, 116, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 111, 71, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #faf8f5 0%, #f5f0e8 50%, #faf8f5 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Clay texture overlay */
+.clay-texture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212, 165, 116, 0.03) 2px, rgba(212, 165, 116, 0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139, 111, 71, 0.02) 2px, rgba(139, 111, 71, 0.02) 4px);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Ceramic particles floating */
+.ceramic-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 165, 116, 0.4), rgba(139, 111, 71, 0.2));
+  animation: floatParticle 15s ease-in-out infinite;
+}
+
+.particle-1 {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  width: 60px;
+  height: 60px;
+  top: 60%;
+  right: 15%;
+  animation-delay: 3s;
+}
+
+.particle-3 {
+  width: 100px;
+  height: 100px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 6s;
+}
+
+.particle-4 {
+  width: 50px;
+  height: 50px;
+  top: 40%;
+  right: 30%;
+  animation-delay: 9s;
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-20px, -60px) scale(0.9);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(40px, -30px) scale(1.05);
+    opacity: 0.5;
+  }
+}
+
+.hero-content-home {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-text-home {
+  animation: fadeInUp 1s ease;
+}
+
+.handcrafted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: rgba(212, 165, 116, 0.15);
+  border: 1px solid rgba(212, 165, 116, 0.3);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  animation: slideInLeft 0.8s ease;
+}
+
+.badge-icon {
+  font-size: 1.2rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hero-title-home {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+  line-height: 1.2;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  animation: fadeInUp 1s ease 0.2s both;
+}
+
+.title-accent {
+  color: var(--primary-color);
+  display: block;
+  position: relative;
+}
+
+.title-accent::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), transparent);
+  animation: expandLine 1s ease 1.2s both;
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.hero-description-home {
+  font-size: 1.3rem;
+  color: var(--text-light);
+  margin-bottom: 2.5rem;
+  line-height: 1.8;
+  animation: fadeInUp 1s ease 0.4s both;
+}
+
+.btn-hero {
+  padding: 1.2rem 2.5rem;
+  font-size: 1.1rem;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 1s ease 0.6s both;
+}
+
+.btn-hero::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-hero:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.hero-visual-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 500px;
+  animation: fadeIn 1.2s ease 0.3s both;
+}
+
+.ceramic-showcase-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ceramic Mug - Soft Sage Green */
+.ceramic-mug {
+  position: absolute;
+  left: 35%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 0s;
+  z-index: 3;
+  position: relative;
+}
+
+.ceramic-mug-1 {
+  width: 140px;
+  height: 180px;
+  animation: mugFloat 8s ease-in-out infinite;
+}
+
+/* Mug body */
+.ceramic-mug-1::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 85%;
+  background: linear-gradient(145deg, #a8b8a0 0%, #8fa085 40%, #7a8b70 100%);
+  border-radius: 0 0 20px 20px / 0 0 30px 30px;
+  box-shadow: 
+    0 25px 70px rgba(143, 160, 133, 0.35),
+    inset 0 20px 40px rgba(122, 139, 112, 0.3),
+    inset 0 -8px 25px rgba(255, 255, 255, 0.2),
+    0 0 0 2px rgba(122, 139, 112, 0.25);
+}
+
+/* Mug rim */
+.ceramic-mug-1::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 18%;
+  background: linear-gradient(145deg, #a8b8a0 0%, #8fa085 100%);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  box-shadow: 
+    inset 0 -3px 8px rgba(122, 139, 112, 0.3),
+    0 2px 6px rgba(255, 255, 255, 0.3);
+  z-index: 2;
+}
+
+/* Mug handle */
+.mug-handle {
+  position: absolute;
+  right: -25px;
+  top: 25%;
+  width: 50px;
+  height: 60px;
+  border: 8px solid #8fa085;
+  border-left: none;
+  border-radius: 0 50px 50px 0;
+  box-shadow: 
+    inset 5px 0 10px rgba(122, 139, 112, 0.3),
+    3px 0 8px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.mug-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 50px;
+  background: linear-gradient(180deg, #8fa085, #7a8b70);
+  border-radius: 5px 0 0 5px;
+}
+
+/* Mountains pattern on the mug */
+.mug-pattern {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 80%;
+  height: 50%;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Mountain silhouette using CSS */
+.mug-pattern::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Mountains using polygon clip-path */
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.4) 25%,
+    transparent 25%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.4) 35%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 50%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.4) 60%,
+    rgba(255, 255, 255, 0.4) 75%,
+    transparent 75%,
+    transparent 100%);
+  clip-path: polygon(
+    0% 100%,   /* Bottom left */
+    15% 70%,   /* First peak */
+    25% 80%,   /* Valley */
+    40% 50%,   /* Second peak (tallest) */
+    55% 65%,   /* Valley */
+    70% 55%,   /* Third peak */
+    85% 70%,   /* Valley */
+    100% 100%  /* Bottom right */
+  );
+}
+
+/* Additional mountain layer for depth */
+.mug-pattern::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80%;
+  background: rgba(255, 255, 255, 0.3);
+  clip-path: polygon(
+    0% 100%,   /* Bottom left */
+    20% 75%,   /* First peak */
+    30% 85%,   /* Valley */
+    45% 60%,   /* Second peak */
+    60% 70%,   /* Valley */
+    75% 65%,    /* Third peak */
+    90% 80%,   /* Valley */
+    100% 100%  /* Bottom right */
+  );
+  opacity: 0.6;
+}
+
+/* Ceramic Bowl 2 - Deep elegant bowl - Light Blue */
+.ceramic-bowl-2 {
+  position: absolute;
+  width: 195px;
+  height: 195px;
+  left: 35%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  animation-delay: 2s;
+  z-index: 2;
+  opacity: 0.96;
+  /* Deep bowl shape - wider at top, narrower at bottom */
+  border-radius: 50% 50% 42% 42% / 58% 58% 38% 38%;
+  background: linear-gradient(165deg, #7db3d9 0%, #6ba5cc 30%, #5a97bf 65%, #4a88b2 100%);
+  box-shadow: 
+    0 22px 65px rgba(107, 165, 204, 0.35),
+    inset 0 30px 50px rgba(74, 136, 178, 0.3),
+    inset 0 -10px 30px rgba(255, 255, 255, 0.2),
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 0 0 4px rgba(74, 136, 178, 0.2);
+  animation: bowlFloat2 8s ease-in-out infinite;
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+}
+
+.ceramic-bowl-2::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.25) 30%, transparent 70%);
+  border-radius: 50% 50% 42% 42% / 58% 58% 38% 38%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ceramic-bowl-2::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50% 50% 42% 42% / 58% 58% 38% 38%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Flower on the blue bowl */
+.bowl-flower {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 45%;
+  height: 45%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Flower petals - 5 distinct white petals */
+.bowl-flower::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  /* 5 petals arranged in a circle */
+  background-image: 
+    /* Top petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Top-right petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Right petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Bottom-right petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Bottom petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Bottom-left petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Left petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%),
+    /* Top-left petal */
+    radial-gradient(ellipse, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 45%, transparent 45%);
+  background-size: 
+    40% 35%, 35% 40%, 40% 35%, 35% 40%,
+    40% 35%, 35% 40%, 40% 35%, 35% 40%;
+  background-position: 
+    50% 5%,    /* Top */
+    80% 20%,   /* Top-right */
+    95% 50%,   /* Right */
+    80% 80%,   /* Bottom-right */
+    50% 95%,   /* Bottom */
+    20% 80%,   /* Bottom-left */
+    5% 50%,    /* Left */
+    20% 20%;   /* Top-left */
+  background-repeat: no-repeat;
+}
+
+/* Flower center - yellow/orange */
+.bowl-flower::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22%;
+  height: 22%;
+  background: radial-gradient(circle, rgba(255, 220, 150, 0.95) 0%, rgba(255, 200, 120, 0.9) 60%, rgba(255, 180, 100, 0.85) 100%);
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 0 0 1.5px rgba(139, 111, 71, 0.25);
+}
+
+/* Additional flowers on the blue bowl */
+.bowl-flower-2 {
+  top: 25%;
+  left: 20%;
+  width: 35%;
+  height: 35%;
+  transform: translate(-50%, -50%);
+}
+
+.bowl-flower-3 {
+  top: 70%;
+  right: 25%;
+  width: 35%;
+  height: 35%;
+  transform: translate(50%, -50%);
+  left: auto;
+}
+
+/* Ceramic Plate - Warm Terracotta Orange */
+.ceramic-plate {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4a574 0%, #c49560 50%, #b8864f 100%);
+  box-shadow: 
+    0 15px 50px rgba(212, 165, 116, 0.35),
+    inset 0 5px 20px rgba(139, 111, 71, 0.3),
+    inset 0 -5px 20px rgba(255, 255, 255, 0.15);
+  animation: plateFloat 8s ease-in-out infinite;
+  border: 2px solid rgba(139, 111, 71, 0.3);
+}
+
+.ceramic-plate::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ceramic-plate::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+}
+
+.ceramic-plate-1 {
+  width: 200px;
+  height: 200px;
+  right: 30%;
+  top: 52%;
+  transform: translate(50%, -50%);
+  animation-delay: 4s;
+  z-index: 2;
+  opacity: 0.88;
+}
+
+/* Cute patterns on the plate */
+.plate-pattern {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: 85%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Cute cat face on the plate */
+.plate-pattern::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  /* Cat head (circle) */
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(139, 111, 71, 0.3);
+}
+
+/* Cat ears */
+.plate-pattern::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  /* Left ear */
+  background-image: 
+    linear-gradient(135deg, transparent 45%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.85) 50%, transparent 50%),
+    linear-gradient(-135deg, transparent 45%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.85) 50%, transparent 50%);
+  background-size: 30% 30%, 30% 30%;
+  background-position: 20% 5%, 80% 5%;
+  background-repeat: no-repeat;
+  /* Cat eyes */
+  background-image: 
+    radial-gradient(circle, rgba(139, 111, 71, 0.9) 3px, transparent 3px),
+    radial-gradient(circle, rgba(139, 111, 71, 0.9) 3px, transparent 3px),
+    linear-gradient(135deg, transparent 45%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.85) 50%, transparent 50%),
+    linear-gradient(-135deg, transparent 45%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.85) 50%, transparent 50%);
+  background-size: 8px 8px, 8px 8px, 30% 30%, 30% 30%;
+  background-position: 35% 45%, 65% 45%, 20% 5%, 80% 5%;
+  background-repeat: no-repeat;
+}
+
+/* Cat nose and mouth using additional element */
+.plate-pattern {
+  background-image: 
+    /* Nose */
+    linear-gradient(180deg, transparent 48%, rgba(255, 200, 200, 0.8) 48%, rgba(255, 200, 200, 0.8) 52%, transparent 52%),
+    /* Mouth line 1 */
+    linear-gradient(150deg, transparent 50%, rgba(139, 111, 71, 0.6) 50%, rgba(139, 111, 71, 0.6) 52%, transparent 52%),
+    /* Mouth line 2 */
+    linear-gradient(210deg, transparent 50%, rgba(139, 111, 71, 0.6) 50%, rgba(139, 111, 71, 0.6) 52%, transparent 52%);
+  background-size: 12px 8px, 15px 2px, 15px 2px;
+  background-position: 50% 55%, 45% 60%, 55% 60%;
+  background-repeat: no-repeat;
+}
+
+@keyframes mugFloat {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-50%, -50%) translateY(-10px) rotate(2deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-18px) rotate(-1.5deg);
+  }
+  75% {
+    transform: translate(-50%, -50%) translateY(-6px) rotate(1.5deg);
+  }
+}
+
+.ceramic-bowl-2 {
+  animation-name: bowlFloat2;
+}
+
+@keyframes bowlFloat2 {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translate(-50%, -50%) translateY(-15px) rotate(-3deg);
+  }
+  66% {
+    transform: translate(-50%, -50%) translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes plateFloat {
+  0%, 100% {
+    transform: translate(50%, -50%) translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translate(50%, -50%) translateY(-14px) rotate(2deg);
+  }
+  60% {
+    transform: translate(50%, -50%) translateY(-18px) rotate(-2deg);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Products Showcase */
+.products-showcase {
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--bg-white);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-header h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+}
+
+.section-header p {
+  font-size: 1.2rem;
+  color: var(--text-light);
+}
+
+.products-grid-home {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+.product-card-home {
+  background: var(--bg-white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 25px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--border-color);
+  position: relative;
+  animation: cardFadeIn 0.6s ease both;
+}
+
+.product-card-home::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.product-card-home:hover::before {
+  opacity: 1;
+}
+
+.product-card-home:hover {
+  transform: translateY(-15px) scale(1.02);
+  box-shadow: 
+    0 20px 60px rgba(212, 165, 116, 0.3),
+    0 0 0 1px rgba(212, 165, 116, 0.2);
+  border-color: var(--primary-color);
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.product-image-home {
+  width: 100%;
+  height: 320px;
+  border-radius: 20px 20px 0 0;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.product-image-home::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(212, 165, 116, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.product-card-home:hover .product-image-home::after {
+  opacity: 1;
+}
+
+.product-card-home:hover .product-image-home {
+  transform: scale(1.1) rotate(1deg);
+}
+
+.product-image-placeholder-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 4rem;
+  background: var(--accent-color);
+}
+
+.product-info-home {
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--bg-white);
+}
+
+.product-info-home h3 {
+  font-size: 1.3rem;
+  margin: 0;
+  color: var(--text-dark);
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.product-price-home {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.product-price-container-home {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.product-price-container-home > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-price-original-home {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-light);
+  text-decoration: line-through;
+}
+
+.product-price-discounted-home {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.product-discount-badge-home {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.view-all-section {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state p,
+.error-state p {
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.error-state p {
+  color: #d32f2f;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Quick Features - Minimal */
+.quick-features {
+  padding: 5rem 2rem;
+  background: linear-gradient(135deg, var(--bg-cream) 0%, var(--accent-color) 100%);
+}
+
+.features-minimal {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.feature-minimal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 1.5rem 2rem;
+  background: var(--bg-white);
+  border-radius: 15px;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  animation: featureSlideIn 0.6s ease both;
+}
+
+.feature-minimal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.feature-minimal:hover::before {
+  left: 100%;
+}
+
+.feature-minimal:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 
+    0 12px 35px rgba(212, 165, 116, 0.2),
+    0 0 0 1px rgba(212, 165, 116, 0.1);
+}
+
+@keyframes featureSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.feature-icon-minimal {
+  font-size: 2rem;
+}
+
+/* Stagger animations for product cards */
+.products-grid-home > *:nth-child(1) { animation-delay: 0.1s; }
+.products-grid-home > *:nth-child(2) { animation-delay: 0.2s; }
+.products-grid-home > *:nth-child(3) { animation-delay: 0.3s; }
+.products-grid-home > *:nth-child(4) { animation-delay: 0.4s; }
+.products-grid-home > *:nth-child(5) { animation-delay: 0.5s; }
+.products-grid-home > *:nth-child(6) { animation-delay: 0.6s; }
+.products-grid-home > *:nth-child(7) { animation-delay: 0.7s; }
+.products-grid-home > *:nth-child(8) { animation-delay: 0.8s; }
+
+/* Responsive */
+@media (max-width: 968px) {
+  .hero-content-home {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .hero-visual-home {
+    height: 350px;
+  }
+
+  .ceramic-mug-1 {
+    width: 120px;
+    height: 155px;
+  }
+
+  .mug-handle {
+    right: -20px;
+    width: 40px;
+    height: 50px;
+    border-width: 6px;
+  }
+
+  .ceramic-bowl-2 {
+    width: 150px;
+    height: 150px;
+  }
+
+  .ceramic-plate-1 {
+    width: 170px;
+    height: 170px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-home {
+    min-height: 50vh;
+    padding: 5.5rem 1rem 2.5rem;
+  }
+
+  .hero-title-home {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .hero-description-home {
+    font-size: 1rem;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .btn-hero {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .section-header {
+    padding: 0 0.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .section-header p {
+    font-size: 0.95rem;
+  }
+
+  .products-showcase {
+    padding: 3rem 1rem;
+  }
+
+  .products-grid-home {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    gap: 1rem;
+    padding: 0 0.5rem 1rem 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .products-grid-home::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .products-grid-home::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 2px;
+  }
+
+  .products-grid-home::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 2px;
+  }
+
+  .product-card-home {
+    flex: 0 0 auto;
+    width: 240px;
+    scroll-snap-align: start;
+    margin-bottom: 0;
+  }
+
+  .product-card-home {
+    border-radius: 12px;
+  }
+
+  .product-image-home {
+    height: 180px;
+  }
+
+  .product-info-home {
+    padding: 0.75rem;
+  }
+
+  .product-info-home h3 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .product-price-container-home {
+    gap: 0.5rem;
+  }
+
+  .product-price-home {
+    font-size: 1.1rem;
+  }
+
+  .product-price-discounted-home {
+    font-size: 1.2rem;
+  }
+
+  .product-price-original-home {
+    font-size: 0.85rem;
+  }
+
+  .features-minimal {
+    gap: 1.25rem;
+    padding: 1.5rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .feature-minimal {
+    font-size: 0.85rem;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .footer-section {
+    text-align: center;
+  }
+
+  .footer-section ul {
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-home {
+    padding: 5rem 0.75rem 2rem;
+    min-height: 45vh;
+  }
+
+  .hero-title-home {
+    font-size: 1.6rem;
+    line-height: 1.3;
+  }
+
+  .hero-description-home {
+    font-size: 0.95rem;
+    padding: 0;
+    margin: 0.75rem 0;
+  }
+
+  .btn-hero {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  .hero-ceramic-shape {
+    width: 200px;
+    height: 200px;
+  }
+
+  .products-showcase {
+    padding: 2.5rem 0.75rem;
+  }
+
+  .section-header {
+    padding: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .section-header p {
+    font-size: 0.9rem;
+  }
+
+  .products-grid-home {
+    gap: 1rem;
+    padding: 0 0.75rem 1rem 0.75rem;
+  }
+
+  .product-card-home {
+    width: 200px;
+    margin: 0;
+  }
+
+  .product-image-home {
+    height: 220px;
+  }
+
+  .product-info-home {
+    padding: 0.75rem;
+  }
+
+  .product-info-home h3 {
+    font-size: 0.95rem;
+  }
+
+  .product-price-home {
+    font-size: 1rem;
+  }
+
+  .product-price-discounted-home {
+    font-size: 1.1rem;
+  }
+
+  .features-minimal {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1.25rem 0.75rem;
+  }
+
+  .feature-minimal {
+    font-size: 0.8rem;
+  }
+
+  .footer-container {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .footer-bottom {
+    padding: 1rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
