@@ -25,6 +25,11 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
     : reviews.length
 
   useEffect(() => {
+    // Scroll to top when product page loads (instant, not smooth, to prevent scrolled-down issue)
+    window.scrollTo(0, 0)
+  }, [productId, product])
+
+  useEffect(() => {
     // If product data is passed directly, use it (from Collections API)
     if (product) {
       // Use images array from API, fallback to image if images array is not available
@@ -200,8 +205,8 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
               </div>
             )}
 
-            {/* Reviews Section */}
-            <div className="reviews-section">
+            {/* Reviews Section - Desktop: shown in images section */}
+            <div className="reviews-section reviews-section-desktop">
               <div className="reviews-header">
                 <h3>Customer Reviews</h3>
                 <div className="reviews-summary">
@@ -495,6 +500,72 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                     <p key={index}>{paragraph}</p>
                   ))}
                 </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Reviews Section - Mobile: shown at the end */}
+        <div className="reviews-section reviews-section-mobile">
+          <div className="reviews-header">
+            <h3>Customer Reviews</h3>
+            <div className="reviews-summary">
+              <div className="average-rating">
+                <span className="rating-stars">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span 
+                      key={i} 
+                      className={`star ${i < Math.round(parseFloat(averageRating)) ? 'filled' : 'empty'}`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </span>
+                <span className="rating-number">{averageRating}</span>
+              </div>
+              <span className="reviews-count">({totalReviews} reviews)</span>
+            </div>
+          </div>
+
+          <div className="reviews-list">
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <div key={review.id} className="review-item">
+                  <div className="review-header">
+                    <div className="reviewer-info">
+                      <div className="reviewer-avatar">
+                        {review.userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="reviewer-details">
+                        <div className="reviewer-name">{review.userName}</div>
+                        <div className="review-date">
+                          {new Date(review.date).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="review-rating">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span 
+                          key={i} 
+                          className={`star ${i < review.rating ? 'filled' : 'empty'}`}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="review-comment">
+                    {review.comment}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="no-reviews">
+                <p>No reviews yet. Be the first to review this product!</p>
               </div>
             )}
           </div>
