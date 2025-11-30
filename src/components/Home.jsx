@@ -174,7 +174,6 @@ function Home({ onNavigateToCollections, onViewProduct }) {
         <div className="footer-container">
           <div className="footer-section">
             <div className="footer-logo">
-              <span className="logo-icon">🏺</span>
               <span className="logo-text">Svrve</span>
             </div>
             <p>Handcrafted ceramics for modern living</p>

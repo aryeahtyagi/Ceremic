@@ -35,8 +35,11 @@
 }
 
 .logo-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
+  font-family: 'Times New Roman MT Condensed', 'Times New Roman', serif;
+  font-size: 2.2rem;
+  font-stretch: condensed;
+  letter-spacing: -2px;
+  font-style: italic;
 }
 
 .nav-menu {
@@ -699,8 +702,11 @@
 }
 
 .footer-logo .logo-text {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Times New Roman MT Condensed', 'Times New Roman', serif;
   font-size: 1.8rem;
+  font-stretch: condensed;
+  letter-spacing: -37px;
+  font-style: italic;
 }
 
 .footer-section p {
@@ -769,6 +775,7 @@
 
   .logo-text {
     font-size: 1.4rem;
+    letter-spacing: -28px;
   }
 
   .logo-icon {
@@ -875,6 +882,7 @@
 
   .logo-text {
     font-size: 1.1rem;
+    letter-spacing: -22px;
   }
 
   .logo-icon {
