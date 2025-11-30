@@ -705,7 +705,7 @@
   font-family: 'Times New Roman MT Condensed', 'Times New Roman', serif;
   font-size: 1.8rem;
   font-stretch: condensed;
-  letter-spacing: -37px;
+  letter-spacing: -2px;
   font-style: italic;
 }
 
@@ -775,11 +775,10 @@
 
   .logo-text {
     font-size: 1.4rem;
-    letter-spacing: -28px;
-  }
-
-  .logo-icon {
-    font-size: 1.4rem;
+    font-family: 'Times New Roman MT Condensed', 'Times New Roman', serif;
+    font-stretch: condensed;
+    letter-spacing: -2px;
+    font-style: italic;
   }
 
   .nav-menu {
@@ -882,11 +881,10 @@
 
   .logo-text {
     font-size: 1.1rem;
-    letter-spacing: -22px;
-  }
-
-  .logo-icon {
-    font-size: 1.1rem;
+    font-family: 'Times New Roman MT Condensed', 'Times New Roman', serif;
+    font-stretch: condensed;
+    letter-spacing: -2px;
+    font-style: italic;
   }
 
   .mobile-menu-btn {
