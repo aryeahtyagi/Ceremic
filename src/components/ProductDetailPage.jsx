@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './ProductDetailPage.css'
+import { fetchProductById, transformProductData } from '../services/api'
 
 function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onIncreaseQuantity, onDecreaseQuantity, onQuickAddSix }) {
   const [productData, setProductData] = useState(null)
@@ -44,11 +45,35 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
       return
     }
 
-    // If only productId is provided, we would fetch from API
-    // For now, this case shouldn't happen since we pass product from Collections
+    // If only productId is provided, fetch from API
     if (productId) {
-      setLoading(false)
-      // In future, you can add: const productData = await fetchProductById(productId)
+      const loadProduct = async () => {
+        try {
+          setLoading(true)
+          const productData = await fetchProductById(productId)
+          const transformedProduct = transformProductData(productData)
+          
+          if (transformedProduct) {
+            // Ensure images array is set
+            const productWithImages = {
+              ...transformedProduct,
+              images: transformedProduct.images && transformedProduct.images.length > 0 
+                ? transformedProduct.images 
+                : (transformedProduct.image ? [transformedProduct.image] : [])
+            }
+            setProductData(productWithImages)
+          } else {
+            setProductData(null)
+          }
+        } catch (error) {
+          console.error('Error fetching product:', error)
+          setProductData(null)
+        } finally {
+          setLoading(false)
+        }
+      }
+      
+      loadProduct()
     }
   }, [productId, product])
 

@@ -141,28 +141,34 @@ function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onCl
       }, 100)
 
       // Redirect to configured URL after showing success message (2 seconds delay)
+      // Only use internal redirects to avoid Google Ads flagging
       setTimeout(() => {
         const redirectUrl = POST_PURCHASE_REDIRECT_URL?.trim()
         
         if (redirectUrl) {
-          // Check if it's an external URL
+          // Only allow internal redirects (relative paths) - no external URLs
+          // This prevents Google Ads from flagging suspicious redirects
           if (redirectUrl.startsWith('http://') || redirectUrl.startsWith('https://')) {
-            // External URL - use window.location
-            window.location.href = redirectUrl
-          } else {
-            // Internal URL - use navigation callback if available, otherwise construct full URL
+            // External URLs are not allowed - use internal thank-you page instead
+            console.warn('External redirect URLs are not allowed. Using internal thank-you page.')
             if (onNavigate && typeof onNavigate === 'function') {
-              // Use the navigation callback to change page
               onNavigate('thank-you')
-              // Update URL manually
-              const currentOrigin = window.location.origin
+              window.history.pushState({}, '', '/Ceremic/thank-you')
+            }
+          } else {
+            // Internal URL - use navigation callback if available
+            if (onNavigate && typeof onNavigate === 'function') {
+              // Use the navigation callback to change page (internal navigation)
+              onNavigate('thank-you')
+              // Update URL using pushState (no full page reload)
               const fullPath = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`
-              window.history.pushState({}, '', `${currentOrigin}${fullPath}`)
+              window.history.pushState({}, '', fullPath)
             } else {
-              // Fallback: construct full URL with current origin
-              const currentOrigin = window.location.origin
+              // Fallback: use pushState for internal navigation (no external redirect)
               const fullPath = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`
-              window.location.href = `${currentOrigin}${fullPath}`
+              window.history.pushState({}, '', fullPath)
+              // Trigger a soft navigation by dispatching a popstate event
+              window.dispatchEvent(new PopStateEvent('popstate'))
             }
           }
         }

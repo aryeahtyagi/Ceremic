@@ -4,6 +4,7 @@ export const API_BASE_URL = 'https://newsletters-constitutional-evanescence-chea
 
 export const API_ENDPOINTS = {
   COLLECTIONS: '/collections',
+  COLLECTION_BY_ID: '/collections', // Base path, append /{id} when calling
   USER_CREATE: '/user/create',
   USER_LOGIN: '/user/login',
   USER_CART: '/user/cart',
@@ -13,12 +14,9 @@ export const API_ENDPOINTS = {
 }
 
 // Redirect URL after successful purchase
-// Change this to your desired thank you page or tracking URL
-// For tracking purchases, you can use:
-// - Google Analytics conversion tracking: 'https://www.google-analytics.com/collect?...'
-// - Facebook Pixel conversion: 'https://www.facebook.com/tr?...'
-// - Your custom thank you page: 'https://yoursite.com/thank-you'
-// - Or any tracking URL you need
-export const POST_PURCHASE_REDIRECT_URL = '/Ceremic/thank-you' // Set your tracking URL here
+// IMPORTANT: Use only internal (relative) paths to avoid Google Ads flagging
+// External URLs (http:// or https://) will be blocked for security
+// This should be a relative path like '/Ceremic/thank-you'
+export const POST_PURCHASE_REDIRECT_URL = '/Ceremic/thank-you' // Internal path only
 
 

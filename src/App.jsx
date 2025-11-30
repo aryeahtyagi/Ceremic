@@ -8,7 +8,7 @@ import Account from './components/Account'
 import Cart from './components/Cart'
 import Orders from './components/Orders'
 import ThankYou from './components/ThankYou'
-import { fetchCollections, transformCollectionsData, updateCartItem, loadUserCart } from './services/api'
+import { fetchCollections, fetchProductById, transformCollectionsData, transformProductData, updateCartItem, loadUserCart } from './services/api'
 import { isUserLoggedIn, getUserData, getUserId } from './utils/userStorage'
 
 function App() {
@@ -23,19 +23,26 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isUserLoggedIn())
   const [userData, setUserData] = useState(getUserData())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false)
 
-  // Load products on mount
+  // Load products on mount (only if not loading a specific product)
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const data = await fetchCollections()
-        const transformedProducts = transformCollectionsData(data)
-        setProducts(transformedProducts)
-      } catch (error) {
-        console.error('Error loading products:', error)
+    const urlParams = new URLSearchParams(window.location.search)
+    const productIdParam = urlParams.get('productId')
+    
+    // Only load all products if there's no productId in URL
+    if (!productIdParam) {
+      const loadProducts = async () => {
+        try {
+          const data = await fetchCollections()
+          const transformedProducts = transformCollectionsData(data)
+          setProducts(transformedProducts)
+        } catch (error) {
+          console.error('Error loading products:', error)
+        }
       }
+      loadProducts()
     }
-    loadProducts()
   }, [])
 
   // Load cart on mount if user is logged in
@@ -78,20 +85,18 @@ function App() {
     loadCart()
   }, [isLoggedIn])
 
-  // Check URL parameters on mount and when products are loaded
+  // Check URL parameters on mount - fetch product directly from API
   useEffect(() => {
     const loadProductFromUrl = async (productId) => {
       try {
-        let productList = products
-        if (productList.length === 0) {
-          const data = await fetchCollections()
-          productList = transformCollectionsData(data)
-          setProducts(productList)
-        }
-        const product = productList.find(p => p.id === productId)
-        if (product) {
+        setIsLoadingProduct(true)
+        // Fetch product directly from API using productId
+        const productData = await fetchProductById(productId)
+        const transformedProduct = transformProductData(productData)
+        
+        if (transformedProduct) {
           setSelectedProductId(productId)
-          setSelectedProduct(product)
+          setSelectedProduct(transformedProduct)
           setCurrentPage('product-detail')
         } else {
           // Product not found, redirect to collections
@@ -100,8 +105,12 @@ function App() {
           setSelectedProduct(null)
         }
       } catch (error) {
-        console.error('Error loading product:', error)
+        console.error('Error loading product from API:', error)
         setCurrentPage('collections')
+        setSelectedProductId(null)
+        setSelectedProduct(null)
+      } finally {
+        setIsLoadingProduct(false)
       }
     }
 
@@ -114,22 +123,20 @@ function App() {
         loadProductFromUrl(productId)
       }
     }
-  }, [products]) // Re-run when products are loaded
+  }, []) // Only run on mount
 
   // Handle browser back/forward buttons and URL changes
   useEffect(() => {
     const loadProductFromUrl = async (productId) => {
       try {
-        let productList = products
-        if (productList.length === 0) {
-          const data = await fetchCollections()
-          productList = transformCollectionsData(data)
-          setProducts(productList)
-        }
-        const product = productList.find(p => p.id === productId)
-        if (product) {
+        setIsLoadingProduct(true)
+        // Fetch product directly from API using productId
+        const productData = await fetchProductById(productId)
+        const transformedProduct = transformProductData(productData)
+        
+        if (transformedProduct) {
           setSelectedProductId(productId)
-          setSelectedProduct(product)
+          setSelectedProduct(transformedProduct)
           setCurrentPage('product-detail')
         } else {
           setCurrentPage('collections')
@@ -137,8 +144,12 @@ function App() {
           setSelectedProduct(null)
         }
       } catch (error) {
-        console.error('Error loading product:', error)
+        console.error('Error loading product from API:', error)
         setCurrentPage('collections')
+        setSelectedProductId(null)
+        setSelectedProduct(null)
+      } finally {
+        setIsLoadingProduct(false)
       }
     }
 
@@ -173,7 +184,7 @@ function App() {
 
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [products])
+  }, [])
 
   // Helper function to get cart item quantity
   const getCartQuantity = (productId) => {
