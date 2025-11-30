@@ -458,7 +458,7 @@ function App() {
             window.history.pushState({}, '', window.location.pathname)
           }} style={{ cursor: 'pointer' }}>
             <span className="logo-icon">🏺</span>
-            <span className="logo-text">Ceremic</span>
+            <span className="logo-text">Svrve</span>
           </div>
           
           {/* Mobile Menu Button */}

@@ -175,7 +175,7 @@ function Home({ onNavigateToCollections, onViewProduct }) {
           <div className="footer-section">
             <div className="footer-logo">
               <span className="logo-icon">🏺</span>
-              <span className="logo-text">Ceremic</span>
+              <span className="logo-text">Svrve</span>
             </div>
             <p>Handcrafted ceramics for modern living</p>
           </div>
@@ -196,7 +196,7 @@ function Home({ onNavigateToCollections, onViewProduct }) {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2024 Ceremic. All rights reserved.</p>
+          <p>&copy; 2024 Svrve. All rights reserved.</p>
         </div>
       </footer>
     </>
