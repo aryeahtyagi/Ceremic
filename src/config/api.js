@@ -1,6 +1,6 @@
 // API Configuration
 // Change this base URL to point to your backend service
-export const API_BASE_URL = 'https://newsletters-constitutional-evanescence-cheap.trycloudflare.com'
+export const API_BASE_URL = ''
 
 export const API_ENDPOINTS = {
   COLLECTIONS: '/collections',

@@ -5,7 +5,7 @@ import { loadUserCart, transformCollectionsData, placeOrder } from '../services/
 import { POST_PURCHASE_REDIRECT_URL } from '../config/api'
 import OrderSuccess from './OrderSuccess'
 
-function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate, onNavigate }) {
+function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate }) {
   const isLoggedIn = isUserLoggedIn()
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -140,37 +140,15 @@ function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onCl
         await refetchCart()
       }, 100)
 
-      // Redirect to configured URL after showing success message (2 seconds delay)
-      // Only use internal redirects to avoid Google Ads flagging
+      // Redirect to thank you page after showing success message (2 seconds delay)
+      // This allows users to see the success message briefly before redirect
       setTimeout(() => {
-        const redirectUrl = POST_PURCHASE_REDIRECT_URL?.trim()
-        
-        if (redirectUrl) {
-          // Only allow internal redirects (relative paths) - no external URLs
-          // This prevents Google Ads from flagging suspicious redirects
-          if (redirectUrl.startsWith('http://') || redirectUrl.startsWith('https://')) {
-            // External URLs are not allowed - use internal thank-you page instead
-            console.warn('External redirect URLs are not allowed. Using internal thank-you page.')
-            if (onNavigate && typeof onNavigate === 'function') {
-              onNavigate('thank-you')
-              window.history.pushState({}, '', '/Ceremic/thank-you')
-            }
-          } else {
-            // Internal URL - use navigation callback if available
-            if (onNavigate && typeof onNavigate === 'function') {
-              // Use the navigation callback to change page (internal navigation)
-              onNavigate('thank-you')
-              // Update URL using pushState (no full page reload)
-              const fullPath = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`
-              window.history.pushState({}, '', fullPath)
-            } else {
-              // Fallback: use pushState for internal navigation (no external redirect)
-              const fullPath = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`
-              window.history.pushState({}, '', fullPath)
-              // Trigger a soft navigation by dispatching a popstate event
-              window.dispatchEvent(new PopStateEvent('popstate'))
-            }
-          }
+        if (POST_PURCHASE_REDIRECT_URL) {
+          console.log('Redirecting to:', POST_PURCHASE_REDIRECT_URL)
+          // Navigate to thank you page
+          window.location.href = POST_PURCHASE_REDIRECT_URL
+        } else {
+          console.warn('POST_PURCHASE_REDIRECT_URL is not configured')
         }
       }, 2000)
     } catch (err) {

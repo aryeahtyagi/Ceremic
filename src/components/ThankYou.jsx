@@ -3,12 +3,12 @@ import './ThankYou.css'
 
 function ThankYou({ onRedirectToHome }) {
   useEffect(() => {
-    // Redirect to home page after 2 seconds
+    // Redirect to home page after 1 second
     const timer = setTimeout(() => {
       if (onRedirectToHome) {
         onRedirectToHome()
       }
-    }, 2000)
+    }, 1000)
 
     return () => clearTimeout(timer)
   }, [onRedirectToHome])
