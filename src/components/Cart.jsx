@@ -5,7 +5,7 @@ import { loadUserCart, transformCollectionsData, placeOrder } from '../services/
 import { POST_PURCHASE_REDIRECT_URL } from '../config/api'
 import OrderSuccess from './OrderSuccess'
 
-function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate }) {
+function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate, onNavigate }) {
   const isLoggedIn = isUserLoggedIn()
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -141,14 +141,24 @@ function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onCl
       }, 100)
 
       // Redirect to thank you page after showing success message (2 seconds delay)
-      // This allows users to see the success message briefly before redirect
+      // Use navigation callback to avoid full page reload (prevents 404 on GitHub Pages)
       setTimeout(() => {
-        if (POST_PURCHASE_REDIRECT_URL) {
-          console.log('Redirecting to:', POST_PURCHASE_REDIRECT_URL)
-          // Navigate to thank you page
-          window.location.href = POST_PURCHASE_REDIRECT_URL
-        } else {
-          console.warn('POST_PURCHASE_REDIRECT_URL is not configured')
+        if (onNavigate && typeof onNavigate === 'function') {
+          // Use the navigation callback to change page (client-side navigation)
+          onNavigate('thank-you')
+          // Update URL using pushState (no full page reload)
+          const fullPath = POST_PURCHASE_REDIRECT_URL?.startsWith('/') 
+            ? POST_PURCHASE_REDIRECT_URL 
+            : `/${POST_PURCHASE_REDIRECT_URL}`
+          window.history.pushState({}, '', fullPath)
+        } else if (POST_PURCHASE_REDIRECT_URL) {
+          // Fallback: use pushState for internal navigation (no external redirect)
+          const fullPath = POST_PURCHASE_REDIRECT_URL.startsWith('/') 
+            ? POST_PURCHASE_REDIRECT_URL 
+            : `/${POST_PURCHASE_REDIRECT_URL}`
+          window.history.pushState({}, '', fullPath)
+          // Trigger a popstate event to handle the route change
+          window.dispatchEvent(new PopStateEvent('popstate'))
         }
       }, 2000)
     } catch (err) {
