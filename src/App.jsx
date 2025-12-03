@@ -617,12 +617,6 @@ function App() {
           onRemoveItem={handleRemoveItem}
           onClose={() => setCurrentPage('collections')}
           onCartUpdate={handleCartUpdate}
-          onNavigate={(page) => {
-            if (page === 'thank-you') {
-              setCurrentPage('thank-you')
-              window.history.pushState({}, '', '/Ceremic/thank-you')
-            }
-          }}
         />
       )}
 
