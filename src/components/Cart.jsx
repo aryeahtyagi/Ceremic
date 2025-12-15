@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import './Cart.css'
-import { isUserLoggedIn, getUserData } from '../utils/userStorage'
-import { loadUserCart, transformCollectionsData, placeOrder } from '../services/api'
+import { isUserLoggedIn, getUserData, getUserId } from '../utils/userStorage'
+import { loadUserCart, transformCollectionsData, placeOrder, logEvent } from '../services/api'
+import { POST_PURCHASE_REDIRECT_URL } from '../config/api'
 import OrderSuccess from './OrderSuccess'
 
 function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onClose, onCartUpdate }) {
@@ -11,6 +12,17 @@ function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onCl
   const [error, setError] = useState(null)
   const [orderPlacing, setOrderPlacing] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
+
+  // Log cart page visit
+  useEffect(() => {
+    const uid = getUserId()
+    logEvent({
+      action: 'VISIT',
+      elementTag: 'CART_PAGE',
+      pageName: 'CART',
+      userId: uid != null ? uid : -1
+    })
+  }, [])
 
   // Load cart data from API
   useEffect(() => {
@@ -139,11 +151,17 @@ function Cart({ cart, onIncreaseQuantity, onDecreaseQuantity, onRemoveItem, onCl
         await refetchCart()
       }, 100)
 
-      // Track conversion event for Google Ads
-      if (typeof window.gtag_report_conversion === 'function') {
-        // Call conversion tracking without redirect
-        window.gtag_report_conversion()
-      }
+      // Redirect to thank you page after showing success message (2 seconds delay)
+      // This allows users to see the success message briefly before redirect
+      setTimeout(() => {
+        if (POST_PURCHASE_REDIRECT_URL) {
+          console.log('Redirecting to:', POST_PURCHASE_REDIRECT_URL)
+          // Navigate to thank you page
+          window.location.href = POST_PURCHASE_REDIRECT_URL
+        } else {
+          console.warn('POST_PURCHASE_REDIRECT_URL is not configured')
+        }
+      }, 2000)
     } catch (err) {
       console.error('Error placing order:', err)
       setError('Failed to place order. Please try again.')

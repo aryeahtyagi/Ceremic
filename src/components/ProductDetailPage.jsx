@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './ProductDetailPage.css'
+import { logEvent } from '../services/api'
+import { getUserId } from '../utils/userStorage'
 
 function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onIncreaseQuantity, onDecreaseQuantity, onQuickAddSix }) {
   const [productData, setProductData] = useState(null)
@@ -28,6 +30,20 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
     // Scroll to top when product page loads (instant, not smooth, to prevent scrolled-down issue)
     window.scrollTo(0, 0)
   }, [productId, product])
+
+  // Log product page visit
+  useEffect(() => {
+    if (!productData || !productData.id) return
+
+    const uid = getUserId()
+
+    logEvent({
+      action: 'VISIT',
+      elementTag: String(productData.id),
+      pageName: 'PRODUCT',
+      userId: uid != null ? uid : -1
+    })
+  }, [productData])
 
   useEffect(() => {
     // If product data is passed directly, use it (from Collections API)
@@ -112,12 +128,83 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
     const isLeftSwipe = distance > minSwipeDistance
     const isRightSwipe = distance < -minSwipeDistance
 
+    let newIndex = selectedImage
+
     if (isLeftSwipe && selectedImage < allImages.length - 1) {
-      setSelectedImage(selectedImage + 1)
+      newIndex = selectedImage + 1
     }
     if (isRightSwipe && selectedImage > 0) {
-      setSelectedImage(selectedImage - 1)
+      newIndex = selectedImage - 1
     }
+
+    if (newIndex !== selectedImage) {
+      setSelectedImage(newIndex)
+
+      // Log image scroll on product page
+      if (productData?.id) {
+        const uid = getUserId()
+        logEvent({
+          action: 'SCROLL',
+          elementTag: String(productData.id),
+          pageName: 'PRODUCT',
+          userId: uid != null ? uid : -1
+        })
+      }
+    }
+  }
+
+  const handleImageClick = (index) => {
+    setSelectedImage(index)
+
+    if (productData?.id) {
+      const uid = getUserId()
+      logEvent({
+        action: 'CLICK_IMAGE',
+        elementTag: String(productData.id),
+        pageName: 'PRODUCT',
+        userId: uid != null ? uid : -1
+      })
+    }
+  }
+
+  const handleAddToCartClick = () => {
+    if (!productData?.id) return
+    onAddToCart(productData)
+    const uid = getUserId()
+    // Track explicit "ADD" click
+    logEvent({
+      action: 'ADD',
+      elementTag: String(productData.id),
+      pageName: 'PRODUCT',
+      userId: uid != null ? uid : -1
+    })
+    // Track cart state change
+    logEvent({
+      action: 'CART',
+      elementTag: String(productData.id),
+      pageName: 'PRODUCT',
+      userId: uid != null ? uid : -1
+    })
+  }
+
+  const handleQuickAddSixClick = () => {
+    if (!productData?.id) return
+    onQuickAddSix(productData)
+    const uid = getUserId()
+    // Track explicit "ADD" via quick add
+    logEvent({
+      action: 'ADD',
+      elementTag: String(productData.id),
+      pageName: 'PRODUCT',
+      userId: uid != null ? uid : -1
+    })
+    // Track cart state change
+    logEvent({
+      action: 'CART',
+      elementTag: String(productData.id),
+      pageName: 'PRODUCT',
+      userId: uid != null ? uid : -1
+    })
   }
 
   return (
@@ -171,7 +258,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                     <span
                       key={index}
                       className={`image-indicator ${selectedImage === index ? 'active' : ''}`}
-                      onClick={() => setSelectedImage(index)}
+                      onClick={() => handleImageClick(index)}
                     ></span>
                   ))}
                 </div>
@@ -187,7 +274,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                     <div
                       key={index}
                       className={`thumbnail-wrapper ${selectedImage === index ? 'active' : ''}`}
-                      onClick={() => setSelectedImage(index)}
+                      onClick={() => handleImageClick(index)}
                     >
                       <img
                         src={img}
@@ -333,7 +420,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                         </div>
                         <button 
                           className="btn btn-quick-add"
-                          onClick={() => onQuickAddSix(productData)}
+                          onClick={handleQuickAddSixClick}
                           title="Quick add 6 items"
                         >
                           +6
@@ -343,16 +430,14 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                       <div className="add-to-cart-buttons">
                         <button 
                           className="btn btn-primary btn-large btn-add-to-cart-in-price btn-add-to-cart-discount-action"
-                          onClick={() => {
-                            onAddToCart(productData)
-                          }}
+                          onClick={handleAddToCartClick}
                         >
                           <span className="btn-icon">🛒</span>
                           <span>Add to Cart</span>
                         </button>
                         <button 
                           className="btn btn-quick-add btn-quick-add-standalone"
-                          onClick={() => onQuickAddSix(productData)}
+                          onClick={handleQuickAddSixClick}
                           title="Quick add 6 items"
                         >
                           +6
@@ -384,7 +469,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                         </div>
                         <button 
                           className="btn btn-quick-add"
-                          onClick={() => onQuickAddSix(productData)}
+                          onClick={handleQuickAddSixClick}
                           title="Quick add 6 items"
                         >
                           +6
@@ -394,9 +479,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                       <div className="add-to-cart-buttons">
                         <button 
                           className="btn btn-primary btn-large btn-add-to-cart-in-price"
-                          onClick={() => {
-                            onAddToCart(productData)
-                          }}
+                          onClick={handleAddToCartClick}
                         >
                           <span className="btn-icon">🛒</span>
                           <span>Add to Cart</span>
@@ -404,7 +487,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                         </button>
                         <button 
                           className="btn btn-quick-add btn-quick-add-standalone"
-                          onClick={() => onQuickAddSix(productData)}
+                          onClick={handleQuickAddSixClick}
                           title="Quick add 6 items"
                         >
                           +6

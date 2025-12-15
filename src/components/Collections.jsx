@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { categories } from '../data/products'
-import { fetchCollections, transformCollectionsData } from '../services/api'
+import { fetchCollections, transformCollectionsData, logEvent } from '../services/api'
+import { getUserId } from '../utils/userStorage'
 import './Collections.css'
 
 function Collections({ onAddToCart, onViewProduct, cart, onIncreaseQuantity, onDecreaseQuantity, onQuickAddSix }) {
@@ -8,6 +9,54 @@ function Collections({ onAddToCart, onViewProduct, cart, onIncreaseQuantity, onD
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const handleProductClick = (product) => {
+    const uid = getUserId()
+    logEvent({
+      action: 'VIEW',
+      elementTag: String(product.id),
+      pageName: 'COLLECTIONS',
+      userId: uid != null ? uid : -1
+    })
+
+    if (onViewProduct) {
+      onViewProduct(product)
+    }
+  }
+
+  const handleCategoryClick = (categoryId) => {
+    setSelectedCategory(categoryId)
+
+    const uid = getUserId()
+
+    // Log specific actions for All Products and New Arrivals
+    if (categoryId === 'all') {
+      logEvent({
+        action: 'ALL_PRODUCTS',
+        elementTag: 'COLLECTIONS_ALL_PRODUCTS',
+        pageName: 'COLLECTIONS',
+        userId: uid != null ? uid : -1
+      })
+    } else if (categoryId === 'new') {
+      logEvent({
+        action: 'NEW_ARRIVALS',
+        elementTag: 'COLLECTIONS_NEW_ARRIVALS',
+        pageName: 'COLLECTIONS',
+        userId: uid != null ? uid : -1
+      })
+    }
+  }
+
+  // Log collections page visit
+  useEffect(() => {
+    const uid = getUserId()
+    logEvent({
+      action: 'VISIT',
+      elementTag: 'COLLECTIONS_PAGE',
+      pageName: 'COLLECTIONS',
+      userId: uid != null ? uid : -1
+    })
+  }, [])
 
   useEffect(() => {
     const loadCollections = async () => {
@@ -44,7 +93,7 @@ function Collections({ onAddToCart, onViewProduct, cart, onIncreaseQuantity, onD
           <button
             key={category.id}
             className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(category.id)}
+            onClick={() => handleCategoryClick(category.id)}
           >
             {category.name}
           </button>
@@ -102,7 +151,7 @@ function Collections({ onAddToCart, onViewProduct, cart, onIncreaseQuantity, onD
                   )}
                   <div 
                     className="product-image"
-                    onClick={() => onViewProduct(product)}
+                    onClick={() => handleProductClick(product)}
                     style={{
                       backgroundImage: product.image ? `url(${product.image})` : 'none',
                       backgroundSize: 'cover',
@@ -152,7 +201,7 @@ function Collections({ onAddToCart, onViewProduct, cart, onIncreaseQuantity, onD
                     <div className="product-actions">
                       <button 
                         className="btn btn-view"
-                        onClick={() => onViewProduct(product)}
+                        onClick={() => handleProductClick(product)}
                       >
                         View Details
                       </button>

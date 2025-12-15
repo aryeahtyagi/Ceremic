@@ -1,11 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Svrve - Handcrafted Ceramics Collection</title>
-    
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-617518614"></script>
     <script>
@@ -15,22 +10,14 @@
       gtag('config', 'AW-617518614');
     </script>
     
-    <!-- Event snippet for Purchase conversion page -->
-    <script>
-      function gtag_report_conversion(url) {
-        var callback = function () {
-          if (typeof(url) != 'undefined') {
-            window.location = url;
-          }
-        };
-        gtag('event', 'conversion', {
-            'send_to': 'AW-617518614/d229CMjNsssbEJasuqYC',
-            'transaction_id': '',
-            'event_callback': callback
-        });
-        return false;
-      }
-    </script>
+    <meta charset="UTF-8" />
+    <!-- Fallback favicon (overridden at runtime via API_URL in main.jsx) -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Svrve - Handcrafted Ceramics Collection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>

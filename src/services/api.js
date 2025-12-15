@@ -80,11 +80,11 @@ export const transformCollectionsData = (apiData) => {
       ? Math.round(originalPrice - (originalPrice * discountPercentage / 100))
       : originalPrice
 
-    // Transform images array - extract base64 values and catalogImage flag
+    // Transform images array - extract imageUrl values and catalogImage flag
     const imagesWithMetadata = (item.images || []).map(img => ({
-      base64: img.base64 || '',
+      imageUrl: img.imageUrl || '',
       catalogImage: img.catalogImage || false
-    })).filter(img => img.base64 !== '')
+    })).filter(img => img.imageUrl !== '')
     
     // Find catalog image (image with catalogImage: true)
     const catalogImageObj = imagesWithMetadata.find(img => img.catalogImage === true)
@@ -94,11 +94,20 @@ export const transformCollectionsData = (apiData) => {
       ? [catalogImageObj, ...imagesWithMetadata.filter(img => img !== catalogImageObj)]
       : imagesWithMetadata
     
-    // Extract base64 values in sorted order
-    const images = sortedImages.map(img => img.base64)
+    // Extract imageUrl values in sorted order
+    const images = sortedImages.map(img => img.imageUrl)
+    
+    // Fallback to image.value if images array is empty
+    const fallbackImage = (item.image && item.image.value) ? item.image.value : ''
     
     // Set catalog image as main image (used in Home and Collections)
-    const mainImage = catalogImageObj ? catalogImageObj.base64 : (images.length > 0 ? images[0] : '')
+    // Priority: catalog image > first image in array > fallback image.value
+    const mainImage = catalogImageObj 
+      ? catalogImageObj.imageUrl 
+      : (images.length > 0 ? images[0] : fallbackImage)
+    
+    // If images array is empty but we have fallback, use it
+    const finalImages = images.length > 0 ? images : (fallbackImage ? [fallbackImage] : [])
 
     return {
       id: item.id,
@@ -108,8 +117,8 @@ export const transformCollectionsData = (apiData) => {
       discountedPrice: discountedPrice,
       hasDiscount: hasDiscount,
       discountPercentage: discountPercentage,
-      image: mainImage, // First image from images array for backward compatibility
-      images: images, // All images array for product detail page
+      image: mainImage, // Catalog image or first image from images array, with fallback to image.value
+      images: finalImages, // All images array for product detail page
       category: 'new', // Default category, can be updated if API provides category
       createdOn: item.createdOn,
       modifiedOn: item.modifiedOn,
@@ -122,6 +131,75 @@ export const transformCollectionsData = (apiData) => {
       reviewsMetaData: reviewsMetaData
     }
   })
+}
+
+// Cache client IP in memory to avoid repeated external calls
+let cachedClientIp = null
+
+/**
+ * Get client public IP (best-effort, frontend-side)
+ * Uses an external IP service; failures are swallowed and return null.
+ * @returns {Promise<string|null>}
+ */
+const getClientIp = async () => {
+  if (cachedClientIp) return cachedClientIp
+
+  try {
+    const response = await fetch('https://api.ipify.org?format=json')
+    if (!response.ok) {
+      return null
+    }
+    const data = await response.json()
+    if (data && data.ip) {
+      cachedClientIp = data.ip
+      return cachedClientIp
+    }
+  } catch (err) {
+    console.error('Error fetching client IP:', err)
+  }
+
+  return null
+}
+
+/**
+ * Log user interaction/event
+ * @param {Object} params - Log parameters
+ * @param {string} params.action - Action type (e.g. VISIT)
+ * @param {string} params.elementTag - Element tag (e.g. product id)
+ * @param {string} params.pageName - Page name (e.g. PRODUCT)
+ * @param {number} params.userId - User id or -1 if unknown
+ * @returns {Promise<void>}
+ */
+export const logEvent = async ({ action, elementTag, pageName, userId }) => {
+  try {
+    const ip = await getClientIp()
+
+    const queryParams = new URLSearchParams({
+      id: '0',
+      // Send best-effort client IP; backend can still use request IP if needed
+      ip: ip || '',
+      userId: String(userId ?? -1),
+      pageName,
+      action,
+      elementTag
+    })
+
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LOG}?${queryParams.toString()}`, {
+      method: 'POST',
+      headers: {
+        accept: '*/*',
+        'ngrok-skip-browser-warning': 'true'
+      }
+    })
+
+    if (!response.ok) {
+      // Non-blocking: log error but don't throw to avoid impacting UX
+      console.error('Error logging event:', response.status, response.statusText)
+    }
+  } catch (error) {
+    // Swallow errors so tracking never breaks the page
+    console.error('Error logging event:', error)
+  }
 }
 
 /**

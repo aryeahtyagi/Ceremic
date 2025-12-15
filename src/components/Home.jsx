@@ -1,11 +1,81 @@
-import React, { useState, useEffect } from 'react'
-import { fetchCollections, transformCollectionsData } from '../services/api'
+import React, { useState, useEffect, useRef } from 'react'
+import { fetchCollections, transformCollectionsData, logEvent } from '../services/api'
+import { getUserId } from '../utils/userStorage'
 import './Home.css'
 
 function Home({ onNavigateToCollections, onViewProduct }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const hasLoggedScrollRef = useRef(false)
+  const initialScrollYRef = useRef(0)
+
+  const handleExploreClick = () => {
+    const uid = getUserId()
+    logEvent({
+      action: 'EXPLORE',
+      elementTag: 'EXPLORE_COLLECTION_HOME',
+      pageName: 'HOME',
+      userId: uid != null ? uid : -1
+    })
+
+    if (onNavigateToCollections) {
+      onNavigateToCollections()
+    }
+  }
+
+  const handleProductClick = (product) => {
+    const uid = getUserId()
+    logEvent({
+      action: 'VIEW',
+      elementTag: String(product.id),
+      pageName: 'HOME',
+      userId: uid != null ? uid : -1
+    })
+
+    if (onViewProduct) {
+      onViewProduct(product)
+    } else if (onNavigateToCollections) {
+      onNavigateToCollections()
+    }
+  }
+
+  // Log home page visit
+  useEffect(() => {
+    const uid = getUserId()
+    logEvent({
+      action: 'VISIT',
+      elementTag: 'HOME_PAGE',
+      pageName: 'HOME',
+      userId: uid != null ? uid : -1
+    })
+  }, [])
+
+  // Log first scroll interaction on home page
+  useEffect(() => {
+    // Capture the scroll position when Home mounts
+    initialScrollYRef.current = window.scrollY || 0
+
+    const handleScroll = () => {
+      if (hasLoggedScrollRef.current) return
+      const currentY = window.scrollY || 0
+
+      // Only treat as a user scroll if we've moved a reasonable distance
+      if (Math.abs(currentY - initialScrollYRef.current) < 40) return
+
+      hasLoggedScrollRef.current = true
+      const uid = getUserId()
+      logEvent({
+        action: 'SCROLL',
+        elementTag: 'HOME_PAGE_SCROLL',
+        pageName: 'HOME',
+        userId: uid != null ? uid : -1
+      })
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -50,7 +120,7 @@ function Home({ onNavigateToCollections, onViewProduct }) {
               Discover unique, handcrafted pieces that bring elegance and warmth to your space. 
               Each piece tells a story of traditional craftsmanship.
             </p>
-            <button className="btn btn-primary btn-hero" onClick={onNavigateToCollections}>
+            <button className="btn btn-primary btn-hero" onClick={handleExploreClick}>
               Explore Collection
             </button>
           </div>
@@ -104,13 +174,7 @@ function Home({ onNavigateToCollections, onViewProduct }) {
                 <div 
                   key={product.id} 
                   className="product-card-home"
-                  onClick={() => {
-                    if (onViewProduct) {
-                      onViewProduct(product)
-                    } else {
-                      onNavigateToCollections()
-                    }
-                  }}
+                  onClick={() => handleProductClick(product)}
                 >
                   <div 
                     className="product-image-home"
