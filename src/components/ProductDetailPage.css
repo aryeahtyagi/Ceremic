@@ -370,6 +370,64 @@
   }
 }
 
+/* 1-day delivery — visible on product hero */
+.delivery-badge-overlay {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  background: linear-gradient(135deg, #1a7f5c 0%, #23a06e 100%);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.35px;
+  text-transform: uppercase;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(26, 127, 92, 0.45);
+  pointer-events: none;
+}
+
+.delivery-badge-symbol {
+  font-size: 1.05rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+.delivery-badge-label {
+  white-space: nowrap;
+}
+
+.delivery-promise-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  margin-bottom: 0.25rem;
+  padding: 0.45rem 0.85rem;
+  width: fit-content;
+  max-width: 100%;
+  background: linear-gradient(135deg, rgba(26, 127, 92, 0.12) 0%, rgba(35, 160, 110, 0.08) 100%);
+  border: 1.5px solid rgba(26, 127, 92, 0.35);
+  border-radius: 10px;
+  color: #156b4d;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.delivery-promise-symbol {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.delivery-promise-text {
+  line-height: 1.2;
+}
+
 .thumbnail-images {
   margin-top: 1.5rem;
 }

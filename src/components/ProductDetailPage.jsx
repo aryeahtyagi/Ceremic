@@ -250,6 +250,14 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                   <span className="sparkle sparkle-4">✨</span>
                 </div>
               )}
+
+              <div
+                className="delivery-badge-overlay"
+                aria-label="One day delivery available on this product"
+              >
+                <span className="delivery-badge-symbol" aria-hidden="true">⚡</span>
+                <span className="delivery-badge-label">1-day delivery</span>
+              </div>
               
               {/* Image indicators for mobile */}
               {allImages.length > 1 && (
@@ -444,7 +452,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                         </button>
                       </div>
                     )}
-                    <p className="cart-note">✨ Secure checkout • Fast delivery</p>
+                    <p className="cart-note">✨ Secure checkout • 1-day delivery</p>
                   </div>
                 ) : (
                   <>
@@ -494,7 +502,7 @@ function ProductDetailPage({ productId, product, onClose, onAddToCart, cart, onI
                         </button>
                       </div>
                     )}
-                    <p className="cart-note">✨ Secure checkout • Fast delivery</p>
+                    <p className="cart-note">✨ Secure checkout • 1-day delivery</p>
                   </>
                 )}
               </div>
